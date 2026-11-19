@@ -1,6 +1,9 @@
 package bsides
 
-import "uuid"
+import (
+	"time"
+	"uuid"
+)
 
 // Playlist is a sequential collection of Items.
 type Playlist interface {
@@ -90,4 +93,25 @@ type Iterator interface {
 	HasNext() bool
 	// HasPrev returns true if there is a previous entry; otherwise, it returns false.
 	HasPrev() bool
+}
+
+// BasicItem implements Item
+type BasicItem struct {
+	name string
+	uri  string
+}
+
+func NewItem(name string, uri string) Item { return &BasicItem{name: name, uri: uri} }
+func (i *BasicItem) DisplayName() string   { return i.name }
+func (i *BasicItem) URI() string           { return i.uri }
+
+// Track represents a basic audio (e.g., music) track and implements Item.
+type Track interface {
+	DisplayName() string
+	URI() string
+	Title() string
+	Artist() string
+	Album() string
+	AlbumArtist() string
+	Duration() time.Duration
 }
