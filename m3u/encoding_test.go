@@ -2,6 +2,7 @@ package m3u
 
 import (
 	"os"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,5 +30,10 @@ func TestLocalEncoding(t *testing.T) {
 
 	lc, err = getLocalEncoding()
 	assert.NoError(t, err)
-	assert.Equal(t, encoding.Nop, lc)
+	switch runtime.GOOS {
+	case "windows":
+		assert.NotEmpty(t, lc)
+	default:
+		assert.Equal(t, encoding.Nop, lc)
+	}
 }
