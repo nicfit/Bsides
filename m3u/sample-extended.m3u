@@ -1,0 +1,16 @@
+#EXTM3U
+#PLAYLIST:Sample Playlist
+#EXTART:Turning Point
+#EXTALB:Demo
+#EXTGENRE:Hardcore
+#EXTALBUMARTURL:https://tinyurl.com/3apbd3ne
+#EXTGRP:Bangers
+file1.mp3
+#EXTGRP:Bangers
+file2.mp3
+#EXTBYT:123456
+file3.mp3
+# A normal comment
+file4.mp3
+#EXTINF:172, The Brian Jonestown Massacre: Who?
+file5.mp3
