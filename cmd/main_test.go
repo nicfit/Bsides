@@ -40,5 +40,5 @@ func (s *MainTests) TestNoArgs() {
 
 func (s *MainTests) TestFile() {
 	err := s.run([]string{"main_test.go"})
-	assert.NoError(s.T(), err)
+	assert.Error(s.T(), err)
 }

@@ -184,7 +184,7 @@ func TestPlaylistFrontBack(t *testing.T) {
 	assert.Equal(t, NilID, empty.Front())
 	assert.Equal(t, NilID, empty.Back())
 
-	pl := makeTestPlaylist(t, 13)
+	pl := MakeTestPlaylist(t, 13)
 	assert.Equal(t, "Track 0", pl.Get(pl.Front()).Item.DisplayName())
 	assert.Equal(t, "Track 12", pl.Get(pl.Back()).Item.DisplayName())
 }
@@ -192,7 +192,7 @@ func TestPlaylistFrontBack(t *testing.T) {
 func TestPlaylistNextPrev(t *testing.T) {
 
 	sz := 13
-	pl := makeTestPlaylist(t, sz)
+	pl := MakeTestPlaylist(t, sz)
 	entries := pl.Entries()
 	for i := range sz {
 		var expected_prev, expected_next ID
@@ -215,7 +215,7 @@ func TestPlaylistNextPrev(t *testing.T) {
 
 func TestPlaylist_Entries(t *testing.T) {
 	// This also verifies makeTestPlaylist
-	pl := makeTestPlaylist(t, 133)
+	pl := MakeTestPlaylist(t, 133)
 	assert.Equal(t, 133, pl.Len())
 	for i, e := range pl.Entries() {
 		assert.Equal(t, fmt.Sprintf("Track %d", i), e.Item.DisplayName())
@@ -232,13 +232,4 @@ func testEntriesEqual(t *testing.T, expected, actual []Entry) {
 		assert.Equal(t, expected[i].Item.DisplayName(), actual[i].Item.DisplayName())
 		assert.Equal(t, expected[i].Item.URI(), actual[i].Item.URI())
 	}
-}
-
-func makeTestPlaylist(t *testing.T, n int) Playlist {
-	p := NewPlaylist()
-	for i := range n {
-		_, err := p.Add(NewItem(fmt.Sprintf("Track %d", i), fmt.Sprintf("file%d.mp3", i)))
-		require.NoError(t, err)
-	}
-	return p
 }

@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSequentialIteratorNext(t *testing.T) {
-	p := makeTestPlaylist(t, 99)
-	it := SequentialIterator(p)
+func TestStandardIteratorNext(t *testing.T) {
+	p := MakeTestPlaylist(t, 99)
+	it := NewSequentialIterator(p)
 
 	assert.Zero(t, it.Current())
 
@@ -36,9 +36,9 @@ func TestSequentialIteratorNext(t *testing.T) {
 	}
 }
 
-func TestSequentialIteratorPrev(t *testing.T) {
-	p := makeTestPlaylist(t, 99)
-	it := SequentialIterator(p)
+func TestStandardIteratorPrev(t *testing.T) {
+	p := MakeTestPlaylist(t, 99)
+	it := NewSequentialIterator(p)
 
 	assert.Zero(t, it.Current())
 	assert.Zero(t, it.Prev())
@@ -72,8 +72,8 @@ func TestSequentialIteratorPrev(t *testing.T) {
 	}
 }
 
-func TestSequentialIteratorEmptyPlaylist(t *testing.T) {
-	p := makeTestPlaylist(t, 0)
-	it := SequentialIterator(p)
+func TestStandardIteratorEmptyPlaylist(t *testing.T) {
+	p := MakeTestPlaylist(t, 0)
+	it := NewSequentialIterator(p)
 	assert.Zero(t, it.Current())
 }
