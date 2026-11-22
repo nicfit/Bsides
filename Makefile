@@ -17,7 +17,7 @@ test-coverage: test
 .PHONY: test test-coverage
 
 clean:
-	@rm -f bin/bsides coverage.out
+	@rm -f bin/bsides coverage.out *.log
 clean-dist: clean
 	@rm -rf bin
 .PHONY: clean clean-dist
