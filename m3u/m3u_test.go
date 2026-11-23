@@ -42,6 +42,14 @@ func Test_NewTrack(t *testing.T) {
 	assert.Equal(t, "zombie dance.mp3", track.URI())
 }
 
+func Test_NewTrack_AlbumArtist(t *testing.T) {
+	track, err := NewTrack("We Do What We Want.mp3")
+	require.NoError(t, err)
+	track.(*entry).artist = "Swingz"
+	assert.Equal(t, track.Artist(), track.AlbumArtist())
+	assert.Equal(t, "Swingz", track.AlbumArtist())
+}
+
 func Test_NewTrack_noURI(t *testing.T) {
 	track, err := NewTrack("")
 	require.Error(t, err)
@@ -327,10 +335,25 @@ func TestPlaylistExport(t *testing.T) {
 
 	m3u_ext, err := Load("sample-extended.m3u")
 	assert.NoError(t, err)
+	m3u_ext.SetName("Two Sides")
 	assert.True(t, m3u_ext.IsExtended())
 	ext_contents = m3u_ext.Export()
-	assert.Equal(t, "#EXTM3U\n#PLAYLIST:Sample Playlist\n#EXTGRP:Bangers\n#EXTART:Turning Point\n#EXTALB:Demo\n#EXTALBUMARTURL:https://tinyurl.com/3apbd3ne\n#EXTGENRE:Hardcore\nfile1.mp3\n#EXTGRP:Bangers\nfile2.mp3\n#EXTBYT:123456\nfile3.mp3\nfile4.mp3\n#EXTINF:172,The Brian Jonestown Massacre: Who?\nfile5.mp3\n", ext_contents)
+	assert.Equal(t, "#EXTM3U\n#PLAYLIST:Two Sides\n#EXTGRP:Bangers\n#EXTART:Turning Point\n#EXTALB:Demo\n#EXTALBUMARTURL:https://tinyurl.com/3apbd3ne\n#EXTGENRE:Hardcore\nfile1.mp3\n#EXTGRP:Bangers\nfile2.mp3\n#EXTBYT:123456\nfile3.mp3\nfile4.mp3\n#EXTINF:172,The Brian Jonestown Massacre: Who?\nfile5.mp3\n", ext_contents)
 	m3u.SetExtended(false)
 	ext_contents = m3u.Export()
 	assert.Equal(t, "file1.mp3\nfile2.mp3\nfile3.mp3\nfile4.mp3\nfile5.mp3\n", contents)
+}
+
+func TestPlaylistExportOptions(t *testing.T) {
+	m3u_ext, err := Load("sample-extended.m3u")
+	assert.NoError(t, err)
+	assert.True(t, m3u_ext.IsExtended())
+
+	ext_contents := m3u_ext.Export(WithExtension(EXT_INF))
+	assert.Equal(t, "#EXTM3U\n#PLAYLIST:Sample Playlist\nfile1.mp3\nfile2.mp3\nfile3.mp3\nfile4.mp3\n#EXTINF:172,The Brian Jonestown Massacre: Who?\nfile5.mp3\n", ext_contents)
+
+	ext_contents = m3u_ext.Export(WithExtension(EXT_INF, EXT_BYTES))
+	assert.Equal(t,
+		"#EXTM3U\n#PLAYLIST:Sample Playlist\nfile1.mp3\nfile2.mp3\n#EXTBYT:123456\nfile3.mp3\nfile4.mp3\n#EXTINF:172,The Brian Jonestown Massacre: Who?\nfile5.mp3\n",
+		ext_contents)
 }

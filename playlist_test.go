@@ -223,6 +223,29 @@ func TestPlaylist_Entries(t *testing.T) {
 	}
 }
 
+func TestPlaylist_ForEach(t *testing.T) {
+	pl := MakeTestPlaylist(t, 133)
+	entries := pl.Entries()
+	count := 0
+	pl.ForEach(func(id ID, item Item) bool {
+		assert.Equal(t, entries[count].ID, id)
+		assert.Equal(t, entries[count].Item, item)
+		count++
+		return true
+	})
+
+	// Interrupt loop
+	count = 0
+	pl.ForEach(func(id ID, item Item) bool {
+		if count == 45 {
+			return false
+		}
+		count++
+		return true
+	})
+	assert.Equal(t, 45, count)
+}
+
 ///////////////////////////////////////////////////////////////////////
 
 func testEntriesEqual(t *testing.T, expected, actual []Entry) {

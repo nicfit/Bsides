@@ -73,7 +73,13 @@ func TestStandardIteratorPrev(t *testing.T) {
 }
 
 func TestStandardIteratorEmptyPlaylist(t *testing.T) {
-	p := MakeTestPlaylist(t, 0)
+	p := MakeTestPlaylist(t, 0).(*playlist)
 	it := NewSequentialIterator(p)
+	assert.Equal(t, p, it.Playlist().(*playlist))
 	assert.Zero(t, it.Current())
+
+	it2 := NewSequentialIterator(p)
+	assert.Equal(t, it.Playlist(), it2.Playlist())
+	it3 := NewSequentialIterator(MakeTestPlaylist(t, 1))
+	assert.NotEqual(t, it3.Playlist(), it2.Playlist())
 }

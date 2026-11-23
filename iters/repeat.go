@@ -2,69 +2,63 @@ package iters
 
 import "github.com/nicfit/bsides"
 
-type RepeatMode int
-
-const (
-	RepeatPlaylist = iota
-	RepeatItem
-)
-
-func NewRepeatingIterator(pl bsides.Playlist, mode RepeatMode) bsides.Iterator {
-	iter := &RepeatIterator{
-		SequentialIterator: bsides.NewSequentialIterator(pl).(*bsides.SequentialIterator),
-		playlist:           pl,
-		mode:               mode,
+func NewRepeatingIterator(iter bsides.Iterator) bsides.Iterator {
+	r := &RepeatIterator{
+		iter: iter,
 	}
-	iter.Reset()
-	return iter
+	r.Reset()
+	return r
 }
 
 type RepeatIterator struct {
-	*bsides.SequentialIterator
+	iter bsides.Iterator
+}
 
-	mode     RepeatMode
-	playlist bsides.Playlist
+func (it *RepeatIterator) Reset() {
+	it.iter.Reset()
+}
+
+func (it *RepeatIterator) Current() bsides.Entry {
+	return it.iter.Current()
+}
+
+func (it *RepeatIterator) Select(id bsides.ID) bool {
+	return it.iter.Select(id)
+}
+
+func (it *RepeatIterator) Playlist() bsides.Playlist {
+	return it.iter.Playlist()
 }
 
 func (it *RepeatIterator) HasNext() bool {
-	return it.playlist.Len() > 0
+	if it.iter.HasNext() {
+		return true
+	}
+	return it.iter.Playlist().Len() > 0
 }
 
 func (it *RepeatIterator) HasPrev() bool {
-	return it.playlist.Len() > 0
+	if it.iter.HasPrev() {
+		return true
+	}
+	// FIXME: This is not true when wrapping Shuffle, which forces Prev=false
+	return it.iter.Playlist().Len() > 0
 }
 
 func (it *RepeatIterator) Next() bsides.Entry {
-	if it.mode == RepeatItem {
-		if it.Current().IsZero() {
-			it.Select(it.playlist.Front())
-		}
-		return it.Current()
+	if !it.iter.HasNext() {
+		it.iter.Reset()
 	}
-
-	next := it.SequentialIterator.Next()
-	if !next.IsZero() {
-		return next
-	}
-
-	it.SequentialIterator.Reset()
-	return it.SequentialIterator.Next()
+	return it.iter.Next()
 }
 
 func (it *RepeatIterator) Prev() bsides.Entry {
-	if it.mode == RepeatItem {
-		if it.Current().IsZero() {
-			it.Select(it.playlist.Back())
-		}
-		return it.Current()
-	}
-
-	prev := it.SequentialIterator.Prev()
+	prev := it.iter.Prev()
 	if !prev.IsZero() {
 		return prev
 	}
 
-	back := it.playlist.Back()
-	it.SequentialIterator.Select(back)
-	return it.playlist.Get(back)
+	back := it.iter.Playlist().Back()
+	it.iter.Select(back)
+	return it.iter.Playlist().Get(back)
 }

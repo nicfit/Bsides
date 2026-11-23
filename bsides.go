@@ -38,6 +38,10 @@ type Playlist interface {
 	Front() ID
 	// Back returns the last ID in the Playlist. If the playlist is empty [NilID] is returned.
 	Back() ID
+
+	// ForEach calls f for each item in order.
+	// Using ForEach() instead of Entries() saves a copy new copy of []Entry.
+	ForEach(f func(ID, Item) bool)
 }
 
 // Item types are stored in Playlists.
@@ -78,6 +82,7 @@ func (entry Entry) IsZero() bool {
 
 // Iterator types traverse playlists in a particular order.
 type Iterator interface {
+	Playlist() Playlist
 	// Reset resets the iterator to the beginning of the iteration.
 	Reset()
 	// Current returns the current entry, or zero-value if none.
