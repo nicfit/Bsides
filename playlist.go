@@ -77,6 +77,7 @@ func (p *playlist) Insert(item Item, id ID) (ID, bool, error) {
 		new_id := NewID()
 		new_elem := p.items.InsertBefore(&Entry{ID: new_id, Item: item}, elem)
 		p.index[new_id] = new_elem
+
 		return new_id, true, nil
 	}
 
@@ -169,4 +170,12 @@ func (p *playlist) findNeighbor(id ID, forward bool) ID {
 		}
 	}
 	return NilID
+}
+
+func (p *playlist) ForEach(f func(ID, Item) bool) {
+	for elem := p.items.Front(); elem != nil; elem = elem.Next() {
+		if !f(elem.Value.(*Entry).ID, elem.Value.(*Entry).Item) {
+			break
+		}
+	}
 }

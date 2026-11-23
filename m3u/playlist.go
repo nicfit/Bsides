@@ -113,7 +113,7 @@ func (m *m3u) Export(opt_args ...ExportOption) string {
 				b.WriteString(EXT_BYTES + strconv.FormatInt(track.Size(), 10) + "\n")
 			}
 			if track.Duration() > 0 && track.Title() != "" && includeExtension(EXT_INF) {
-				b.WriteString(fmt.Sprintf("%s%d,%s\n", EXT_INF, int(track.Duration().Seconds()), track.Title()))
+				b.WriteString(fmt.Sprintf("%s%d,%s\n", EXT_INF, int(track.Duration().Seconds()), track.DisplayName()))
 			}
 		}
 

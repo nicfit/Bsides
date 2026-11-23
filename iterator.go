@@ -14,6 +14,10 @@ type SequentialIterator struct {
 	curr     ID
 }
 
+func (it *SequentialIterator) Playlist() Playlist {
+	return it.playlist
+}
+
 func (it *SequentialIterator) Reset() {
 	it.curr = NilID
 }
