@@ -41,7 +41,6 @@ func (it *RepeatIterator) HasPrev() bool {
 	if it.iter.HasPrev() {
 		return true
 	}
-	// FIXME: This is not true when wrapping Shuffle, which forces Prev=false
 	return it.iter.Playlist().Len() > 0
 }
 
