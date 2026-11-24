@@ -7,6 +7,9 @@ import (
 
 // Playlist is a sequential collection of Items.
 type Playlist interface {
+	// Metadata returns information about the Playlist format.
+	Metadata() PlaylistMetadata
+
 	// Len returns the number of tracks in the playlist.
 	Len() int
 	// Add adds a track to the playlist and returns its unique identifier. An error is returned when
@@ -26,9 +29,6 @@ type Playlist interface {
 	// Get returns the [Entry] by [ID] or a zero value if not found.
 	Get(id ID) Entry
 
-	// Entries returns a slice of all entries in the playlist.
-	Entries() []Entry
-
 	// Next returns the next ID following the argument `id`, or [NilID] if there is none.
 	// These methods are to support [Iterator] implementations, and those should be preferred to traversing playlists.
 	Next(id ID) ID
@@ -42,6 +42,8 @@ type Playlist interface {
 	// ForEach calls f for each item in order.
 	// Using ForEach() instead of Entries() saves a copy new copy of []Entry.
 	ForEach(f func(ID, Item) bool)
+	// Entries returns a slice of all entries in the playlist.
+	Entries() []Entry
 }
 
 // Item types are stored in Playlists.
@@ -82,6 +84,7 @@ func (entry Entry) IsZero() bool {
 
 // Iterator types traverse playlists in a particular order.
 type Iterator interface {
+	// Playlist is the list being iterated
 	Playlist() Playlist
 	// Reset resets the iterator to the beginning of the iteration.
 	Reset()
@@ -119,4 +122,12 @@ type Track interface {
 	Album() string
 	AlbumArtist() string
 	Duration() time.Duration
+}
+
+// PlaylistMetadata contains information about the format of the playlist, and NOT details about a particular
+// playlist.
+type PlaylistMetadata struct {
+	TypeID     string
+	Extensions []string
+	Mimetypes  []string
 }
