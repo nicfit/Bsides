@@ -21,6 +21,14 @@ type Playlist interface {
 	Export(opts ...ExportOption) string
 }
 
+func (m *m3u) Metadata() bsides.PlaylistMetadata {
+	return bsides.PlaylistMetadata{
+		TypeID:     "M3U",
+		Extensions: []string{DOT_M3U, DOT_M3U8},
+		Mimetypes:  []string{"application/mpegurl", "application/x-mpegurl", "audio/mpegurl", "audio/x-mpeg"},
+	}
+}
+
 func NewPlaylist() Playlist {
 	m3u := &m3u{
 		Playlist: bsides.NewPlaylist(),

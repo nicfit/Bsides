@@ -25,6 +25,10 @@ type playlist struct {
 	index map[ID]*list.Element // O(1) lookup by Id
 }
 
+func (p *playlist) Metadata() PlaylistMetadata {
+	return PlaylistMetadata{}
+}
+
 func (p *playlist) Len() int {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
