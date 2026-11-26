@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/nicfit/bsides"
+	"github.com/nicfit/bsides/factory"
 	"github.com/nicfit/bsides/iters"
 	"github.com/urfave/cli/v3"
 )
@@ -53,7 +54,7 @@ func newIterCommand() *cli.Command {
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) (err error) {
 			var playlist bsides.Playlist
-			if playlist, err = LoadPlaylist(cmd.StringArg("playlist")); err != nil {
+			if playlist, err = factory.Load(cmd.StringArg("playlist")); err != nil {
 				return err
 			}
 

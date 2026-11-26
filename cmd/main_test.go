@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/nicfit/bsides/factory"
 	"github.com/nicfit/bsides/m3u"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -51,7 +52,7 @@ func (s *MainTests) TestFile() {
 	assert.Error(s.T(), err)
 }
 
-func (s *MainTests) TestLoadPlaylist() {
+func (s *MainTests) TestFactoryLoad() {
 	tmpfiles := make([]string, 0)
 	defer func() {
 		for i, _ := range tmpfiles {
@@ -78,7 +79,7 @@ func (s *MainTests) TestLoadPlaylist() {
 		tmp, err := os.CreateTemp("", "pl*"+tc.ext)
 		assert.NoError(s.T(), err)
 		tmpfiles = append(tmpfiles, tmp.Name())
-		playlist, err := LoadPlaylist(tmp.Name())
+		playlist, err := factory.Load(tmp.Name())
 		if tc.expect_success {
 			assert.NoError(s.T(), err)
 			assert.NotNil(s.T(), playlist)
