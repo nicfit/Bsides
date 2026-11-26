@@ -123,7 +123,7 @@ func TestNewShuffleIteratorSelect(t *testing.T) {
 func TestShuffleWithRepeating(t *testing.T) {
 	pl := bsides.MakeTestPlaylist(t, 634)
 	shuffle := NewShuffleIterator(pl)
-	repeating := NewRepeatingIterator(shuffle)
+	repeating := NewRepeatingIterator(shuffle, 5)
 	for range 3 {
 		assert.NotZero(t, repeating.Next())
 	}

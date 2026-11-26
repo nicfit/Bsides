@@ -7,7 +7,7 @@ GOARCH ?=
 all: clean build test
 
 build:
-	@GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/bsides cmd/main.go
+	@GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/Bsides cmd/*.go
 .PHONY: all build
 
 test:
@@ -17,7 +17,7 @@ test-coverage: test
 .PHONY: test test-coverage
 
 clean:
-	@rm -f bin/bsides coverage.out *.log
+	@rm -f bin/Bsides coverage.out *.log
 clean-dist: clean
 	@rm -rf bin
 .PHONY: clean clean-dist

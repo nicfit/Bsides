@@ -12,7 +12,7 @@ func TestNewRepeatingIteratorSizeZero(t *testing.T) {
 	// An empty playlist
 	var iter bsides.Iterator
 	empty := bsides.NewPlaylist()
-	iter = NewRepeatingIterator(bsides.NewSequentialIterator(empty))
+	iter = NewRepeatingIterator(bsides.NewSequentialIterator(empty), 3)
 	assert.Equal(t, empty, iter.Playlist())
 	assert.False(t, iter.HasNext())
 	assert.False(t, iter.HasPrev())
@@ -26,7 +26,7 @@ func TestNewRepeatingIteratorSizeZero(t *testing.T) {
 func TestNewRepeatingIteratorSizeOne(t *testing.T) {
 	pl := bsides.MakeTestPlaylist(t, 1)
 
-	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl))
+	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl), 3)
 	// The iterator is not started, so...
 	assert.Zero(t, iter.Current())
 	// Size >0 means there is always a next/prev
@@ -45,7 +45,7 @@ func TestNewRepeatingIteratorSizeTwo(t *testing.T) {
 	var iter bsides.Iterator
 	pl := bsides.MakeTestPlaylist(t, 2)
 
-	iter = NewRepeatingIterator(bsides.NewSequentialIterator(pl))
+	iter = NewRepeatingIterator(bsides.NewSequentialIterator(pl), 3)
 	assert.Zero(t, iter.Current())
 	assert.True(t, iter.HasNext())
 	assert.True(t, iter.HasPrev())
@@ -64,7 +64,7 @@ func TestNewRepeatingIteratorSizeTwo(t *testing.T) {
 func TestRepeatingIteratorPlaylistForward(t *testing.T) {
 	pl := bsides.MakeTestPlaylist(t, 99)
 
-	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl))
+	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl), 100)
 	count := 0
 	for range 1000 {
 		assert.True(t, iter.HasNext())
@@ -81,7 +81,7 @@ func TestRepeatingIteratorPlaylistForward(t *testing.T) {
 func TestRepeatingIteratorPlaylistBackward(t *testing.T) {
 	pl := bsides.MakeTestPlaylist(t, 99)
 
-	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl))
+	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl), 100)
 	count := 98
 	for range 1000 {
 		assert.True(t, iter.HasNext())
@@ -91,6 +91,36 @@ func TestRepeatingIteratorPlaylistBackward(t *testing.T) {
 		count--
 		if count == -1 {
 			count = 98
+		}
+	}
+}
+
+func TestRepeatExhaustionNext(t *testing.T) {
+	sz, times := 99, 2
+	pl := bsides.MakeTestPlaylist(t, sz)
+	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl), times)
+	for i := range sz * (times + 1) {
+		next := iter.Next()
+		if i <= sz*times {
+			assert.NotZero(t, next)
+		} else {
+			assert.Zero(t, next)
+			assert.False(t, iter.HasNext())
+		}
+	}
+}
+
+func TestRepeatExhaustionPrev(t *testing.T) {
+	sz, times := 99, 2
+	pl := bsides.MakeTestPlaylist(t, sz)
+	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl), times)
+	for i := range sz * (times + 1) {
+		prev := iter.Prev()
+		if i <= sz*times {
+			assert.NotZero(t, prev)
+		} else {
+			assert.Zero(t, prev)
+			assert.False(t, iter.HasPrev())
 		}
 	}
 }

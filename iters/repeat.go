@@ -2,19 +2,22 @@ package iters
 
 import "github.com/nicfit/bsides"
 
-func NewRepeatingIterator(iter bsides.Iterator) bsides.Iterator {
+func NewRepeatingIterator(iter bsides.Iterator, times int) bsides.Iterator {
 	r := &RepeatIterator{
-		iter: iter,
+		iter:  iter,
+		times: times,
+		count: 0,
 	}
-	r.Reset()
 	return r
 }
 
 type RepeatIterator struct {
-	iter bsides.Iterator
+	iter         bsides.Iterator
+	count, times int
 }
 
 func (it *RepeatIterator) Reset() {
+	it.count = 0
 	it.iter.Reset()
 }
 
@@ -31,6 +34,9 @@ func (it *RepeatIterator) Playlist() bsides.Playlist {
 }
 
 func (it *RepeatIterator) HasNext() bool {
+	if it.exhausted() {
+		return false
+	}
 	if it.iter.HasNext() {
 		return true
 	}
@@ -38,6 +44,9 @@ func (it *RepeatIterator) HasNext() bool {
 }
 
 func (it *RepeatIterator) HasPrev() bool {
+	if it.exhausted() {
+		return false
+	}
 	if it.iter.HasPrev() {
 		return true
 	}
@@ -45,19 +54,46 @@ func (it *RepeatIterator) HasPrev() bool {
 }
 
 func (it *RepeatIterator) Next() bsides.Entry {
+	if it.exhausted() {
+		return bsides.Entry{}
+	}
 	if !it.iter.HasNext() {
 		it.iter.Reset()
 	}
-	return it.iter.Next()
+	next := it.iter.Next()
+	if !next.IsZero() {
+		it.count++
+	}
+	return next
 }
 
 func (it *RepeatIterator) Prev() bsides.Entry {
+	if it.exhausted() {
+		return bsides.Entry{}
+	}
 	prev := it.iter.Prev()
 	if !prev.IsZero() {
+		it.count++
 		return prev
 	}
 
-	back := it.iter.Playlist().Back()
-	it.iter.Select(back)
-	return it.iter.Playlist().Get(back)
+	it.iter.Reset()
+
+	var entry bsides.Entry
+	if _, ok := it.iter.(*bsides.SequentialIterator); ok {
+		// This logic is good for sequential but not shuffled, it results predicable first result
+		back := it.iter.Playlist().Back()
+		it.iter.Select(back)
+		entry = it.iter.Playlist().Get(back)
+	} else {
+		entry = it.iter.Prev()
+	}
+	if !entry.IsZero() {
+		it.count++
+	}
+	return entry
+}
+
+func (it *RepeatIterator) exhausted() bool {
+	return it.count > it.times*it.Playlist().Len()
 }

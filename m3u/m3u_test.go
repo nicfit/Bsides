@@ -1,9 +1,9 @@
 package m3u
 
 import (
+	"bytes"
 	"fmt"
 	"os"
-	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -36,24 +36,16 @@ func TestLoad(t *testing.T) {
 }
 
 func Test_NewTrack(t *testing.T) {
-	track, err := NewTrack("zombie dance.mp3")
-	require.NoError(t, err)
+	track := NewTrack("zombie dance.mp3")
 	require.NotNil(t, track)
 	assert.Equal(t, "zombie dance.mp3", track.URI())
 }
 
 func Test_NewTrack_AlbumArtist(t *testing.T) {
-	track, err := NewTrack("We Do What We Want.mp3")
-	require.NoError(t, err)
+	track := NewTrack("We Do What We Want.mp3")
 	track.(*entry).artist = "Swingz"
 	assert.Equal(t, track.Artist(), track.AlbumArtist())
 	assert.Equal(t, "Swingz", track.AlbumArtist())
-}
-
-func Test_NewTrack_noURI(t *testing.T) {
-	track, err := NewTrack("")
-	require.Error(t, err)
-	require.Nil(t, track)
 }
 
 func TestLoadSample(t *testing.T) {
@@ -102,36 +94,47 @@ func TestLoadSampleExtended(t *testing.T) {
 		track, ok := entry.Item.(Track)
 		require.True(t, ok)
 
-		if slices.Contains([]string{"file1.mp3", "file2.mp3"}, track.URI()) {
+		switch track.URI() {
+		case "file1.mp3":
 			assert.Equal(t, "Bangers", track.Group())
-		} else {
-			assert.Empty(t, track.Group())
-		}
-
-		if "file1.mp3" == track.URI() {
 			assert.Equal(t, "Turning Point", track.Artist())
 			assert.Equal(t, "Demo", track.Album())
 			assert.Equal(t, "Hardcore", track.Genre())
 			assert.Equal(t, "https://tinyurl.com/3apbd3ne", track.AlbumArtURL())
-		} else {
+			assert.Zero(t, track.Size())
+		case "file2.mp3":
+			assert.Equal(t, "Bangers", track.Group())
 			assert.Empty(t, track.Artist())
 			assert.Empty(t, track.Album())
 			assert.Empty(t, track.Genre())
 			assert.Empty(t, track.AlbumArtURL())
-		}
-
-		if "file3.mp3" == track.URI() {
-			assert.Equal(t, int64(123456), track.Size())
-		} else {
 			assert.Zero(t, track.Size())
-		}
-
-		if "file5.mp3" == track.URI() {
-			assert.Equal(t, "The Brian Jonestown Massacre: Who?", track.Title())
+		case "file3.mp3":
+			assert.Equal(t, int64(123456), track.Size())
+			assert.Empty(t, track.Group())
+			assert.Empty(t, track.Artist())
+			assert.Empty(t, track.Album())
+			assert.Empty(t, track.Genre())
+			assert.Empty(t, track.AlbumArtURL())
+		case "file4.mp3":
+			assert.Empty(t, track.Group())
+			assert.Empty(t, track.Artist())
+			assert.Empty(t, track.Album())
+			assert.Empty(t, track.Genre())
+			assert.Empty(t, track.AlbumArtURL())
+			assert.Zero(t, track.Size())
+		case "file5.mp3":
+			assert.Equal(t, "The Brian Jonestown Massacre", track.Artist())
+			assert.Equal(t, "Who?", track.Title())
+			assert.Equal(t, "The Brian Jonestown Massacre - Who?", track.DisplayName())
 			assert.Equal(t, 172*time.Second, track.Duration())
-		} else {
-			assert.Equal(t, "", track.Title())
-			assert.Equal(t, 0*time.Second, track.Duration())
+			assert.Empty(t, track.Group())
+			assert.Empty(t, track.Album())
+			assert.Empty(t, track.Genre())
+			assert.Empty(t, track.AlbumArtURL())
+			assert.Zero(t, track.Size())
+		default:
+			assert.Fail(t, "Unknown track URI")
 		}
 	}
 }
@@ -218,6 +221,12 @@ func TestNewPlaylist(t *testing.T) {
 	assert.Empty(t, m3u.Name())
 	assert.False(t, m3u.IsExtended())
 	assert.Equal(t, 0, m3u.Len())
+
+	meta := m3u.Metadata()
+	assert.Equal(t, TYPE_ID, meta.TypeID)
+	assert.ElementsMatch(t, []string{DOT_M3U8, DOT_M3U}, meta.Extensions)
+	assert.Contains(t, meta.Mimetypes, "application/mpegurl")
+	assert.Contains(t, meta.Mimetypes, "audio/mpegurl")
 }
 
 func TestAddInsertWrongType(t *testing.T) {
@@ -249,14 +258,12 @@ func TestPlaylist_AddRemoveInsertMove(t *testing.T) {
 	}
 
 	// Add
-	track6, err := NewTrack("file6.mp3")
-	require.NoError(t, err)
+	track6 := NewTrack("file6.mp3")
 	pid, err := m3u.Add(track6)
 	require.NoError(t, err)
 	assert.Equal(t, pid, m3u.Entries()[5].ID)
 
-	track7, err := NewTrack("file7.mp3")
-	require.NoError(t, err)
+	track7 := NewTrack("file7.mp3")
 	pid, err = m3u.Add(track7)
 	require.NoError(t, err)
 	assert.Equal(t, pid, m3u.Entries()[6].ID)
@@ -269,15 +276,13 @@ func TestPlaylist_AddRemoveInsertMove(t *testing.T) {
 
 	// Insert
 
-	track8, err := NewTrack("file8.mp3")
-	require.NoError(t, err)
+	track8 := NewTrack("file8.mp3")
 	pid, inserted, err := m3u.Insert(track8, m3u.Entries()[0].ID)
 	require.NoError(t, err)
 	assert.True(t, inserted)
 	assert.Equal(t, pid, m3u.Entries()[0].ID)
 
-	track9, err := NewTrack("file9.mp3")
-	require.NoError(t, err)
+	track9 := NewTrack("file9.mp3")
 	pid, inserted, err = m3u.Insert(track9, m3u.Entries()[5].ID)
 	require.NoError(t, err)
 	assert.True(t, inserted)
@@ -338,7 +343,7 @@ func TestPlaylistExport(t *testing.T) {
 	m3u_ext.SetName("Two Sides")
 	assert.True(t, m3u_ext.IsExtended())
 	ext_contents = m3u_ext.Export()
-	assert.Equal(t, "#EXTM3U\n#PLAYLIST:Two Sides\n#EXTGRP:Bangers\n#EXTART:Turning Point\n#EXTALB:Demo\n#EXTALBUMARTURL:https://tinyurl.com/3apbd3ne\n#EXTGENRE:Hardcore\nfile1.mp3\n#EXTGRP:Bangers\nfile2.mp3\n#EXTBYT:123456\nfile3.mp3\nfile4.mp3\n#EXTINF:172,The Brian Jonestown Massacre: Who?\nfile5.mp3\n", ext_contents)
+	assert.Equal(t, "#EXTM3U\n#PLAYLIST:Two Sides\n#EXTGRP:Bangers\n#EXTART:Turning Point\n#EXTALB:Demo\n#EXTALBUMARTURL:https://tinyurl.com/3apbd3ne\n#EXTGENRE:Hardcore\nfile1.mp3\n#EXTGRP:Bangers\nfile2.mp3\n#EXTBYT:123456\nfile3.mp3\nfile4.mp3\n#EXTART:The Brian Jonestown Massacre\n#EXTINF:172,The Brian Jonestown Massacre - Who?\nfile5.mp3\n", ext_contents)
 	m3u.SetExtended(false)
 	ext_contents = m3u.Export()
 	assert.Equal(t, "file1.mp3\nfile2.mp3\nfile3.mp3\nfile4.mp3\nfile5.mp3\n", contents)
@@ -350,10 +355,47 @@ func TestPlaylistExportOptions(t *testing.T) {
 	assert.True(t, m3u_ext.IsExtended())
 
 	ext_contents := m3u_ext.Export(WithExtension(EXT_INF))
-	assert.Equal(t, "#EXTM3U\n#PLAYLIST:Sample Playlist\nfile1.mp3\nfile2.mp3\nfile3.mp3\nfile4.mp3\n#EXTINF:172,The Brian Jonestown Massacre: Who?\nfile5.mp3\n", ext_contents)
+	assert.Equal(t, "#EXTM3U\n#PLAYLIST:Sample Playlist\nfile1.mp3\nfile2.mp3\nfile3.mp3\nfile4.mp3\n#EXTINF:172,The Brian Jonestown Massacre - Who?\nfile5.mp3\n", ext_contents)
 
 	ext_contents = m3u_ext.Export(WithExtension(EXT_INF, EXT_BYTES))
 	assert.Equal(t,
-		"#EXTM3U\n#PLAYLIST:Sample Playlist\nfile1.mp3\nfile2.mp3\n#EXTBYT:123456\nfile3.mp3\nfile4.mp3\n#EXTINF:172,The Brian Jonestown Massacre: Who?\nfile5.mp3\n",
+		"#EXTM3U\n#PLAYLIST:Sample Playlist\nfile1.mp3\nfile2.mp3\n#EXTBYT:123456\nfile3.mp3\nfile4.mp3\n#EXTINF:172,The Brian Jonestown Massacre - Who?\nfile5.mp3\n",
 		ext_contents)
+}
+
+func TestDisplayNameProcessing(t *testing.T) {
+	m3u_data := EXT_M3U + `
+#EXTINF:345,Tool - Jerk-off
+track1.mp3
+#EXTINF:345,Tool-Jerk-off
+track2.mp3
+`
+	m3u, err := LoadData(bytes.NewBufferString(m3u_data))
+	assert.NoError(t, err)
+	track1 := m3u.Entries()[0].Item.(Track)
+	assert.Equal(t, "Tool", track1.Artist())
+	assert.Equal(t, "Jerk-off", track1.Title())
+	assert.Empty(t, track1.(*entry).displayName)
+	assert.Equal(t, "Tool - Jerk-off", track1.DisplayName())
+	track2 := m3u.Entries()[1].Item.(Track)
+	assert.NotEqual(t, track1, track2)
+	assert.Empty(t, track2.Artist())
+	assert.Empty(t, track2.Title())
+	assert.Equal(t, "Tool-Jerk-off", track2.DisplayName())
+
+	// Export option
+	export := m3u.Export(WithExtension(EXT_INF), WithDisplayNameFormatter(func(t Track) string {
+		n := ""
+		if t.Artist() != "" {
+			n += t.Artist() + " : "
+		}
+		if t.Title() != "" {
+			n += t.Title()
+		}
+		if n == "" {
+			n = "Iceburn Rules"
+		}
+		return n
+	}))
+	assert.Equal(t, "#EXTM3U\n#EXTINF:345,Tool : Jerk-off\ntrack1.mp3\n#EXTINF:345,Iceburn Rules\ntrack2.mp3\n", export)
 }

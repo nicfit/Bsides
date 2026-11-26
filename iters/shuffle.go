@@ -27,6 +27,8 @@ func (s *ShuffleIterator) Playlist() bsides.Playlist {
 }
 
 func (s *ShuffleIterator) Reset() {
+	s.shuffled = make([]bsides.ID, 0, s.playlist.Len())
+
 	s.curr = bsides.NilID
 	s.playlist.ForEach(func(id bsides.ID, item bsides.Item) bool {
 		s.shuffled = append(s.shuffled, id)
