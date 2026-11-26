@@ -1,5 +1,5 @@
 
-``bash
+```bash
 # Load a playlist and print it to the screen
 $ Bsides playlist.m3u
 
