@@ -20,9 +20,9 @@ func TestLocalEncoding(t *testing.T) {
 	LC_CTYPE := os.Getenv("LC_CTYPE")
 	LANG := os.Getenv("LANG")
 	defer func() {
-		os.Setenv("LC_ALL", LC_ALL)
-		os.Setenv("LC_CTYPE", LC_CTYPE)
-		os.Setenv("LANG", LANG)
+		assert.NoError(t, os.Setenv("LC_ALL", LC_ALL))
+		assert.NoError(t, os.Setenv("LC_CTYPE", LC_CTYPE))
+		assert.NoError(t, os.Setenv("LANG", LANG))
 	}()
 	assert.NoError(t, os.Setenv("LC_ALL", ""))
 	assert.NoError(t, os.Setenv("LC_CTYPE", ""))

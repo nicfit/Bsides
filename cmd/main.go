@@ -41,7 +41,7 @@ Bsides [OPTIONS] CMD
 			if err != nil {
 				return err
 			}
-			fmt.Fprintln(cmd.Writer, playlist.(m3u.Playlist).Export())
+			_, _ = fmt.Fprintln(cmd.Writer, playlist.(m3u.Playlist).Export())
 			return nil
 		},
 		Arguments: []cli.Argument{

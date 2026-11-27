@@ -82,7 +82,7 @@ func TestNewPlaylistAddRemoveMove(t *testing.T) {
 	assert.Equal(t, 5, pl.Len())
 	assert.NotEmpty(t, fifth_id)
 	assert.NotContains(t, ids, fifth_id)
-	ids = append(ids, fifth_id)
+	_ = append(ids, fifth_id)
 	testEntriesEqual(t, []Entry{
 		{ID: third_id, Item: third},
 		{ID: first_id, Item: first},
@@ -138,7 +138,8 @@ func TestNilAdd(t *testing.T) {
 
 func TestNilInsert(t *testing.T) {
 	pl := NewPlaylist()
-	pl.Add(NewItem("Resentment", ""))
+	_, err := pl.Add(NewItem("Resentment", ""))
+	assert.NoError(t, err)
 	assert.Equal(t, 1, pl.Len())
 
 	id, ok, err := pl.Insert(nil, pl.Entries()[0].ID)

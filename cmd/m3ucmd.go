@@ -93,7 +93,7 @@ func newM3uCommand() *cli.Command {
 				export_opts = append(export_opts, m3u.WithoutExtension(ext))
 			}
 
-			fmt.Fprintln(cmd.Writer, playlist.Export(export_opts...))
+			_, _ = fmt.Fprintln(cmd.Writer, playlist.Export(export_opts...))
 
 			return nil
 		},

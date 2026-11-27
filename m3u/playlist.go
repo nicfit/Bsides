@@ -106,8 +106,7 @@ func (m *m3u) Export(opt_args ...ExportOption) string {
 				if opts.extInfFormatter != nil {
 					display_name = opts.extInfFormatter(track)
 				}
-				b.WriteString(fmt.Sprintf("%s%d,%s\n", EXT_INF,
-					int(track.Duration().Seconds()), display_name))
+				_, _ = fmt.Fprintf(&b, "%s%d,%s\n", EXT_INF, int(track.Duration().Seconds()), display_name)
 			}
 		}
 
@@ -184,7 +183,7 @@ func (m *m3u) Import(root string, opt_args ...ImportOption) error {
 		}
 		return nil
 	}); err != nil {
-		return fmt.Errorf("error walking path: %v\n", err)
+		return fmt.Errorf("error walking path: %v", err)
 	}
 
 	return nil
@@ -267,31 +266,35 @@ var ExtensionTags = []string{
 func loadData(fp io.Reader) (_ *m3u, err error) {
 	m3u := NewPlaylist().(*m3u)
 
-	addEntry := func(e *entry, uri string) error {
+	var curr *entry = nil
+	addEntry := func(uri string) error {
 		if uri == "" || strings.HasPrefix(uri, "#") {
 			return nil
 		}
 
-		e.uri = uri
-		if _, err = m3u.Add(e); err != nil {
+		curr.uri = uri
+		if _, err = m3u.Add(curr); err != nil {
 			return err
 		}
+		curr = nil
 		return nil
 	}
-	var curr *entry = nil
+
 	line_num := 0
 	scanner := bufio.NewScanner(fp)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		line_num++
+		if curr == nil {
+			curr = &entry{}
+		}
 
 		// Extended M3U check
 		if line_num == 1 {
-			curr = &entry{}
 			if line == EXT_M3U {
 				m3u.extended = true
 			} else {
-				if err := addEntry(curr, line); err != nil {
+				if err := addEntry(line); err != nil {
 					return nil, err
 				}
 			}
@@ -306,10 +309,9 @@ func loadData(fp io.Reader) (_ *m3u, err error) {
 			}
 		}
 
-		if err := addEntry(curr, line); err != nil {
+		if err := addEntry(line); err != nil {
 			return nil, err
 		}
-		curr = &entry{}
 	}
 
 	if err = scanner.Err(); err != nil {

@@ -95,5 +95,5 @@ func (it *RepeatIterator) Prev() bsides.Entry {
 }
 
 func (it *RepeatIterator) exhausted() bool {
-	return it.count > it.times*it.Playlist().Len()
+	return it.count >= it.times*it.Playlist().Len()
 }

@@ -101,7 +101,7 @@ func TestRepeatExhaustionNext(t *testing.T) {
 	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl), times)
 	for i := range sz * (times + 1) {
 		next := iter.Next()
-		if i <= sz*times {
+		if i < sz*times {
 			assert.NotZero(t, next)
 		} else {
 			assert.Zero(t, next)
@@ -116,7 +116,7 @@ func TestRepeatExhaustionPrev(t *testing.T) {
 	iter := NewRepeatingIterator(bsides.NewSequentialIterator(pl), times)
 	for i := range sz * (times + 1) {
 		prev := iter.Prev()
-		if i <= sz*times {
+		if i < sz*times {
 			assert.NotZero(t, prev)
 		} else {
 			assert.Zero(t, prev)

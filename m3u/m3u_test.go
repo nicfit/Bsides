@@ -345,7 +345,7 @@ func TestPlaylistExport(t *testing.T) {
 	ext_contents = m3u_ext.Export()
 	assert.Equal(t, "#EXTM3U\n#PLAYLIST:Two Sides\n#EXTGRP:Bangers\n#EXTART:Turning Point\n#EXTALB:Demo\n#EXTALBUMARTURL:https://tinyurl.com/3apbd3ne\n#EXTGENRE:Hardcore\nfile1.mp3\n#EXTGRP:Bangers\nfile2.mp3\n#EXTBYT:123456\nfile3.mp3\nfile4.mp3\n#EXTART:The Brian Jonestown Massacre\n#EXTINF:172,The Brian Jonestown Massacre - Who?\nfile5.mp3\n", ext_contents)
 	m3u.SetExtended(false)
-	ext_contents = m3u.Export()
+	_ = m3u.Export()
 	assert.Equal(t, "file1.mp3\nfile2.mp3\nfile3.mp3\nfile4.mp3\nfile5.mp3\n", contents)
 }
 

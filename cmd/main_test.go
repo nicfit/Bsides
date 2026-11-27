@@ -55,7 +55,7 @@ func (s *MainTests) TestFile() {
 func (s *MainTests) TestFactoryLoad() {
 	tmpfiles := make([]string, 0)
 	defer func() {
-		for i, _ := range tmpfiles {
+		for i := range tmpfiles {
 			_ = os.Remove(tmpfiles[i])
 		}
 	}()
@@ -144,7 +144,7 @@ func (s *MainTests) TestIterRepeat() {
 	assert.NoError(s.T(), err)
 	scanner := bufio.NewScanner(s.stdout)
 	non_blank := false
-	for _ = range 3 {
+	for range 3 {
 		for i := range 5 {
 			scanner.Scan()
 			line := strings.TrimSpace(scanner.Text())
@@ -163,7 +163,7 @@ func (s *MainTests) TestIterReverseRepeat() {
 	assert.NoError(s.T(), err)
 	scanner := bufio.NewScanner(s.stdout)
 	non_blank := false
-	for _ = range 5 {
+	for range 5 {
 		for i := 5; i > 0; i-- {
 			scanner.Scan()
 			line := strings.TrimSpace(scanner.Text())
@@ -183,7 +183,7 @@ func (s *MainTests) TestShuffle() {
 
 	chosen := make([]string, 0)
 	scanner := bufio.NewScanner(s.stdout)
-	for _ = range 5 {
+	for range 5 {
 		scanner.Scan()
 		line := strings.TrimSpace(scanner.Text())
 		assert.NoError(s.T(), scanner.Err())
@@ -201,8 +201,8 @@ func (s *MainTests) TestShuffleReverse() {
 
 	chosen := make([]string, 0)
 	scanner := bufio.NewScanner(s.stdout)
-	for _ = range 4 {
-		for _ = range 5 {
+	for range 4 {
+		for range 5 {
 			scanner.Scan()
 			line := strings.TrimSpace(scanner.Text())
 			assert.NoError(s.T(), scanner.Err())
@@ -222,8 +222,8 @@ func (s *MainTests) TestShuffleRepeat() {
 
 	chosen := make([]string, 0)
 	scanner := bufio.NewScanner(s.stdout)
-	for _ = range 7 {
-		for _ = range 5 {
+	for range 7 {
+		for range 5 {
 			scanner.Scan()
 			line := strings.TrimSpace(scanner.Text())
 			assert.NoError(s.T(), scanner.Err())
@@ -243,8 +243,8 @@ func (s *MainTests) TestShuffleRepeatReverse() {
 
 	chosen := make([]string, 0)
 	scanner := bufio.NewScanner(s.stdout)
-	for _ = range 4 {
-		for _ = range 5 {
+	for range 4 {
+		for range 5 {
 			scanner.Scan()
 			line := strings.TrimSpace(scanner.Text())
 			assert.NoError(s.T(), scanner.Err())
