@@ -21,3 +21,8 @@ clean:
 clean-dist: clean
 	@rm -rf bin
 .PHONY: clean clean-dist
+
+update-deps:
+	go get -u ./...
+	go mod tidy
+.PHONY: update-deps

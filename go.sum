@@ -1,5 +1,7 @@
 github.com/nicfit/go-eyeD3 v0.0.0-20261123031313-16d372fecb16 h1:iUKFgLunI6LjrGIA3k2YIVDwu+eOTcoZROxUasIYM64=
 github.com/nicfit/go-eyeD3 v0.0.0-20261123031313-16d372fecb16/go.mod h1:WuL+H2Vpgs8ZpeSoK3ETXT6NROf6iDWMiOrnvr73Nd0=
+github.com/nicfit/go-eyeD3 v1.0.0 h1:+UH2u7G+qbjvW/Ue9mz2Ah7kcrEQ2SQuX7xjPatJgBk=
+github.com/nicfit/go-eyeD3 v1.0.0/go.mod h1:WuL+H2Vpgs8ZpeSoK3ETXT6NROf6iDWMiOrnvr73Nd0=
 github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWDWE=
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
 github.com/urfave/cli/v3 v3.14.0 h1:a8414NQlHJs0c/iBsulKLzlES0n/lEAskbL2LKpU4/s=
