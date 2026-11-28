@@ -13,6 +13,7 @@ func TestStandardIteratorNext(t *testing.T) {
 	it := NewSequentialIterator(p)
 
 	assert.Zero(t, it.Current())
+	assert.True(t, it.HasNext())
 
 	// Two passes through the iterator to ensure Reset() works correctly
 	for range 2 {

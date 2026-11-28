@@ -12,6 +12,7 @@ func NewSequentialIterator(p Playlist) Iterator {
 type SequentialIterator struct {
 	playlist Playlist
 	curr     ID
+	started  bool
 }
 
 func (it *SequentialIterator) Playlist() Playlist {
@@ -20,23 +21,33 @@ func (it *SequentialIterator) Playlist() Playlist {
 
 func (it *SequentialIterator) Reset() {
 	it.curr = NilID
+	it.started = false
 }
 
 func (it *SequentialIterator) Current() Entry {
 	return it.playlist.Get(it.curr)
 }
 
-func (it *SequentialIterator) Next() Entry {
+func (it *SequentialIterator) Next() (next Entry) {
+	defer func() {
+		if !next.IsZero() {
+			it.started = true
+		}
+	}()
+
 	if it.curr == NilID {
 		it.curr = it.playlist.Front()
-		return it.playlist.Get(it.curr)
+		next = it.playlist.Get(it.curr)
+		return
 	}
 
-	if next := it.playlist.Next(it.curr); !next.IsNil() {
-		it.curr = next
-		return it.playlist.Get(next)
+	if n := it.playlist.Next(it.curr); !n.IsNil() {
+		it.curr = n
+		next = it.playlist.Get(n)
+		return
 	}
-	return Entry{}
+
+	return
 }
 
 func (it *SequentialIterator) Prev() Entry {
@@ -57,6 +68,9 @@ func (it *SequentialIterator) Select(id ID) bool {
 }
 
 func (it *SequentialIterator) HasNext() bool {
+	if !it.started && it.playlist.Len() > 0 {
+		return true
+	}
 	return !it.playlist.Next(it.curr).IsNil()
 }
 
